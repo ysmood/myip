@@ -3,7 +3,6 @@ package myip
 import (
 	"context"
 	"net"
-	"regexp"
 )
 
 // GetInterfaceIP get the ip of your interface, useful when you want to
@@ -26,11 +25,11 @@ func GetPublicIP() (string, error) {
 		PreferGo: true,
 		Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
 			d := net.Dialer{}
-			return d.DialContext(ctx, "udp", "8.8.8.8:53")
+			return d.DialContext(ctx, "udp", "ns1.google.com:53")
 		},
 	}
 	ctx := context.Background()
 	txt, err := r.LookupTXT(ctx, "o-o.myaddr.l.google.com")
 
-	return regexp.MustCompile(`\d+\.\d+\.\d+\.\d+`).FindString(txt[1]), err
+	return txt[0], err
 }
