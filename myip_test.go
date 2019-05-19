@@ -24,6 +24,22 @@ func TestGetInterfaceIP(t *testing.T) {
 	}
 }
 
+func TestGetInterfaceIPMultipleTimes(t *testing.T) {
+	ipA, err := GetInterfaceIP()
+	if err != nil {
+		panic(err)
+	}
+
+	ipB, err := GetInterfaceIP()
+	if err != nil {
+		panic(err)
+	}
+
+	if ipA != ipB {
+		panic("ip should be the same")
+	}
+}
+
 func TestGetPublicIP(t *testing.T) {
 	var ip string
 	var err error
@@ -47,5 +63,21 @@ func TestGetPublicIP(t *testing.T) {
 
 	if strings.TrimSpace(string(body)) != ip {
 		panic("not equal")
+	}
+}
+
+func TestGetPublicIPMultipleTimes(t *testing.T) {
+	ipA, err := GetPublicIP()
+	if err != nil {
+		panic(err)
+	}
+
+	ipB, err := GetPublicIP()
+	if err != nil {
+		panic(err)
+	}
+
+	if ipA != ipB {
+		panic("ip should be the same")
 	}
 }
