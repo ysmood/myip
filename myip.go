@@ -8,7 +8,7 @@ import (
 // GetInterfaceIP get the ip of your interface, useful when you want to
 // get your ip inside a private network, such as wifi network.
 func GetInterfaceIP() (string, error) {
-	conn, err := net.Dial("udp", "8.8.8.8:80")
+	conn, err := net.Dial("udp", "ns1.google.com:53")
 	if err != nil {
 		return "", err
 	}
