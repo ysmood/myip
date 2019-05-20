@@ -3,9 +3,10 @@ package myip
 import (
 	"io/ioutil"
 	"net/http"
-	"regexp"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetInterfaceIP(t *testing.T) {
@@ -15,13 +16,7 @@ func TestGetInterfaceIP(t *testing.T) {
 		panic(err)
 	}
 
-	privateIPReg := regexp.MustCompile(
-		`(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)`,
-	)
-
-	if !privateIPReg.MatchString(ip) {
-		panic("ip is not private")
-	}
+	assert.Regexp(t, `\A(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)`, ip)
 }
 
 func TestGetInterfaceIPMultipleTimes(t *testing.T) {
@@ -35,9 +30,7 @@ func TestGetInterfaceIPMultipleTimes(t *testing.T) {
 		panic(err)
 	}
 
-	if ipA != ipB {
-		panic("ip should be the same")
-	}
+	assert.Equal(t, ipA, ipB)
 }
 
 func TestGetPublicIP(t *testing.T) {
@@ -61,9 +54,7 @@ func TestGetPublicIP(t *testing.T) {
 		panic(err)
 	}
 
-	if strings.TrimSpace(string(body)) != ip {
-		panic("not equal")
-	}
+	assert.Equal(t, ip, strings.TrimSpace(string(body)))
 }
 
 func TestGetPublicIPMultipleTimes(t *testing.T) {
@@ -77,7 +68,13 @@ func TestGetPublicIPMultipleTimes(t *testing.T) {
 		panic(err)
 	}
 
-	if ipA != ipB {
-		panic("ip should be the same")
-	}
+	assert.Equal(t, ipA, ipB)
+}
+
+func TestDialError(t *testing.T) {
+	tmp := NameServer
+	NameServer = "a.com"
+	_, err := GetInterfaceIP()
+	NameServer = tmp
+	assert.EqualError(t, err, "dial udp: address a.com: missing port in address")
 }
