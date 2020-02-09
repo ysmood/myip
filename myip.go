@@ -2,6 +2,7 @@ package myip
 
 import (
 	"context"
+	"errors"
 	"net"
 )
 
@@ -31,8 +32,14 @@ func GetPublicIP() (string, error) {
 			return d.DialContext(ctx, "udp", NameServer)
 		},
 	}
-	ctx := context.Background()
-	txt, err := r.LookupTXT(ctx, "o-o.myaddr.l.google.com")
+	txt, err := r.LookupTXT(context.Background(), "o-o.myaddr.l.google.com")
+	if err != nil {
+		return "", err
+	}
 
-	return txt[0], err
+	if len(txt) == 0 {
+		return "", errors.New("[myip] can't get a ip")
+	}
+
+	return txt[0], nil
 }
