@@ -18,7 +18,7 @@ func Test(t *testing.T) {
 }
 
 func (t T) GetInterfaceIP() {
-	ip, err := GetInterfaceIP()
+	ip, err := New().GetInterfaceIP()
 
 	if err != nil {
 		panic(err)
@@ -28,12 +28,12 @@ func (t T) GetInterfaceIP() {
 }
 
 func (t T) GetInterfaceIPMultipleTimes() {
-	ipA, err := GetInterfaceIP()
+	ipA, err := New().GetInterfaceIP()
 	if err != nil {
 		panic(err)
 	}
 
-	ipB, err := GetInterfaceIP()
+	ipB, err := New().GetInterfaceIP()
 	if err != nil {
 		panic(err)
 	}
@@ -44,7 +44,7 @@ func (t T) GetInterfaceIPMultipleTimes() {
 func (t T) GetPublicIP() {
 	var ip string
 	var err error
-	ip, err = GetPublicIP()
+	ip, err = New().GetPublicIP()
 
 	if err != nil {
 		panic(err)
@@ -66,12 +66,12 @@ func (t T) GetPublicIP() {
 }
 
 func (t T) GetPublicIPMultipleTimes() {
-	ipA, err := GetPublicIP()
+	ipA, err := New().GetPublicIP()
 	if err != nil {
 		panic(err)
 	}
 
-	ipB, err := GetPublicIP()
+	ipB, err := New().GetPublicIP()
 	if err != nil {
 		panic(err)
 	}
@@ -80,9 +80,8 @@ func (t T) GetPublicIPMultipleTimes() {
 }
 
 func (t T) DialError() {
-	tmp := NameServer
-	NameServer = "a.com"
-	_, err := GetInterfaceIP()
-	NameServer = tmp
-	t.Eq(err.Error(), "dial udp: address a.com: missing port in address")
+	im := New()
+	im.NameServer = "a.com"
+	_, err := im.GetInterfaceIP()
+	t.Eq(err.Error(), "dial udp4: address a.com: missing port in address")
 }
