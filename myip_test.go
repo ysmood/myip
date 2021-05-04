@@ -6,20 +6,28 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/ysmood/got"
 )
 
-func TestGetInterfaceIP(t *testing.T) {
+type T struct {
+	got.G
+}
+
+func Test(t *testing.T) {
+	got.Each(t, T{})
+}
+
+func (t T) GetInterfaceIP() {
 	ip, err := GetInterfaceIP()
 
 	if err != nil {
 		panic(err)
 	}
 
-	assert.Regexp(t, `\A(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)`, ip)
+	t.Regex(`\A(^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.)|(^198\.18\.)`, ip)
 }
 
-func TestGetInterfaceIPMultipleTimes(t *testing.T) {
+func (t T) GetInterfaceIPMultipleTimes() {
 	ipA, err := GetInterfaceIP()
 	if err != nil {
 		panic(err)
@@ -30,10 +38,10 @@ func TestGetInterfaceIPMultipleTimes(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, ipA, ipB)
+	t.Eq(ipA, ipB)
 }
 
-func TestGetPublicIP(t *testing.T) {
+func (t T) GetPublicIP() {
 	var ip string
 	var err error
 	ip, err = GetPublicIP()
@@ -54,10 +62,10 @@ func TestGetPublicIP(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, ip, strings.TrimSpace(string(body)))
+	t.Eq(ip, strings.TrimSpace(string(body)))
 }
 
-func TestGetPublicIPMultipleTimes(t *testing.T) {
+func (t T) GetPublicIPMultipleTimes() {
 	ipA, err := GetPublicIP()
 	if err != nil {
 		panic(err)
@@ -68,13 +76,13 @@ func TestGetPublicIPMultipleTimes(t *testing.T) {
 		panic(err)
 	}
 
-	assert.Equal(t, ipA, ipB)
+	t.Eq(ipA, ipB)
 }
 
-func TestDialError(t *testing.T) {
+func (t T) DialError() {
 	tmp := NameServer
 	NameServer = "a.com"
 	_, err := GetInterfaceIP()
 	NameServer = tmp
-	assert.EqualError(t, err, "dial udp: address a.com: missing port in address")
+	t.Eq(err.Error(), "dial udp: address a.com: missing port in address")
 }
