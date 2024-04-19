@@ -27,12 +27,15 @@ func (mi *MyIP) GetInterfaceIP() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer conn.Close()
 
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	defer func() { _ = conn.Close() }()
+
+	localAddr := conn.LocalAddr().(*net.UDPAddr) //nolint: forcetypeassert
 
 	return localAddr.IP.String(), nil
 }
+
+var errNoPublicIP = errors.New("[myip] can't get a ip")
 
 // GetPublicIP get the ip that is public to global.
 func (mi *MyIP) GetPublicIP() (string, error) {
@@ -40,16 +43,18 @@ func (mi *MyIP) GetPublicIP() (string, error) {
 		PreferGo: true,
 		Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
 			d := net.Dialer{}
+
 			return d.DialContext(ctx, mi.Protocol, mi.NameServer)
 		},
 	}
+
 	txt, err := r.LookupTXT(context.Background(), mi.IPServer)
 	if err != nil {
 		return "", err
 	}
 
 	if len(txt) == 0 {
-		return "", errors.New("[myip] can't get a ip")
+		return "", errNoPublicIP
 	}
 
 	return txt[0], nil

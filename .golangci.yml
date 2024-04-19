@@ -1,17 +1,36 @@
-
-run:
-  skip-dirs-use-default: false
-
 linters:
-  enable:
-    - gofmt
-    - golint
-    - gocyclo
-    - misspell
+  enable-all: true
+  disable:
+    - gochecknoinits
+    - paralleltest
+    - wrapcheck
+    - gosec
+    - gochecknoglobals
+    - musttag
+    - varnamelen
+    - revive
+    - testpackage
+    - testableexamples
+    - exhaustruct
+    - depguard
+    - stylecheck
 
-gocyclo:
-  min-complexity: 15
+    # Deprecated ones:
+    - structcheck
+    - interfacer
+    - deadcode
+    - varcheck
+    - ifshort
+    - exhaustivestruct
+    - golint
+    - maligned
+    - nosnakecase
+    - scopelint
+
+linters-settings:
+  gocyclo:
+    min-complexity: 15
 
 issues:
   exclude-use-default: false
-
+  exclude-dirs-use-default: false

@@ -1,8 +1,6 @@
 package myip
 
 import (
-	"io/ioutil"
-	"net/http"
 	"strings"
 	"testing"
 
@@ -19,7 +17,6 @@ func Test(t *testing.T) {
 
 func (t T) GetInterfaceIP() {
 	ip, err := New().GetInterfaceIP()
-
 	if err != nil {
 		panic(err)
 	}
@@ -42,27 +39,10 @@ func (t T) GetInterfaceIPMultipleTimes() {
 }
 
 func (t T) GetPublicIP() {
-	var ip string
-	var err error
-	ip, err = New().GetPublicIP()
+	ip, err := New().GetPublicIP()
+	t.E(err)
 
-	if err != nil {
-		panic(err)
-	}
-
-	var resp *http.Response
-	resp, err = http.Get("https://ipinfo.io/ip")
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		panic(err)
-	}
-
-	t.Eq(ip, strings.TrimSpace(string(body)))
+	t.Eq(ip, strings.TrimSpace(t.Req("", "https://ipinfo.io/ip").String()))
 }
 
 func (t T) GetPublicIPMultipleTimes() {
